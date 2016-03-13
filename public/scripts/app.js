@@ -35,6 +35,7 @@ var LightBox = React.createClass({
             <p>{d.title}</p>
             <p>{d.company}</p>
             <p>{d.country}</p>
+            <p>{d.interests}</p>
             <p>{d.bio}</p>
           </div>
         </div>
@@ -63,6 +64,7 @@ var Attendees = React.createClass({
         console.error('http://localhost:3000/attendees', status, err.toString());
       }.bind(this)
     });
+    window.addEventListener('scroll', this.handleScroll);
   },
   clickHandler: function(item) {
     var itemId = this.state.data[item].id;
@@ -79,6 +81,23 @@ var Attendees = React.createClass({
         console.error('http://localhost:3000/attendees', status, err.toString());
       }.bind(this)
     });
+  },
+  handleScroll: function() {
+    if($(window).scrollTop() + $(window).height() == $(document).height()) {
+      $.ajax({
+        url: 'http://localhost:3000/attendees' + '?page=' + this.state.page,
+        dataType: 'json',
+        cache: false,
+        success: function(data) {
+          var newArray = this.state.data.concat(data.attendees);
+          this.setState({data: newArray});
+          this.setState({page: this.state.page + 1});
+        }.bind(this),
+        error: function(xhr, status, err) {
+          console.error('http://localhost:3000/attendees', status, err.toString());
+        }.bind(this)
+      });
+    }
   },
   render: function() {
     return (
